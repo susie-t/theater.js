@@ -1,0 +1,102 @@
+body{
+  background-color:#444444;
+}
+#play{
+}
+#frame, .frame{
+  display:block;
+  margin:0px auto 0px auto;
+  background-color:#000000;
+  width:600px;
+  height:400px;
+}
+
+#msg, .msg{
+  margin:0 auto 0 auto;
+  letter-spacing:1px;
+  width:596px;
+  height:150px;
+  font-size:16px;
+  color:#ffffff;
+  padding:2px;
+  background-color:#000000;
+  line-height:1.5em;
+}
+#msg span{
+  
+}
+#msg a{
+  color:#ff6600;
+}
+#reset, .reset{
+  display:block;
+  letter-spacing:1px;
+  color:#ffffff;
+  border-style:solid;
+  border-color:#cccccc;
+  border-width:1px;
+  background-color:#009900;
+  margin:0 auto 0 auto;
+  position:relative;
+  width:100px;
+  left:250px;
+}
+div.menu{
+  padding:5px;
+  margin:0px;
+  text-align:center;
+  background-color:#cc9966;
+  border-style:solid;
+  border-color:#660000;
+  border-width:4px;
+  width:250px;
+}
+div.menu .menu-handle{
+  margin:0px 0px 5px 0px;
+  padding:0px;
+  height:17px;
+  background-color:#660000;
+}
+div.menu .menu-handle .menu-handle-title{
+  font-size:10px;
+  text-align:center;
+  margin:0px;
+  padding:2px;
+  color:#ffffff;
+}
+div.menu .menu-handle .menu-handle-control button{
+  font-size:13px;
+  font-weight:bold;
+  text-align:center;
+  margin:1px;
+  padding:0px;
+  height:15px;
+  width:15px;
+  background-color:blue;
+  color:#ffffff;
+  border-style:none;
+  cursor:pointer;
+}
+div.menu form{
+  margin:0px;
+  padding:0px;
+}
+div.menu .menu-contents{
+  text-align:center;
+  color:#ffffff;
+  font-weight:bold;
+}
+div.menu .menu-contents button.menu-contents-control{
+  height:25px;
+  width:100px;
+  border-color:#660000;
+  background-color:#990000;
+  color:white;
+  margin:2px;
+  border-width:2px;
+}
+div.mask {
+  background-color:#666666;
+  filter:alpha(opacity=60);
+  opacity:0.6;
+}
