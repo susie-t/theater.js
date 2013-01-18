@@ -49,6 +49,8 @@ Readme.prototype = {
     var isHeadListNumber = isDiary ? false : (obj.isHeadListNumber !== false);
     var isWeb = obj.isWeb;
     var isForPaste = obj.isForPaste;
+    var isPrettyPrint = obj.prettyPrint || true;
+    var defaultPrettyPrint = obj.defaultPrettyPrint || false;
 
     var isFirefox = (/firefox/i).test(navigator.userAgent); //Firefoxバグ?対応
     var current = [];
@@ -244,6 +246,8 @@ Readme.prototype = {
       var _terop = page.terop || terop;
       var _isHeadListNumber = (page.isHeadListNumber != null) ? page.isHeadListNumber : isHeadListNumber;
       var _isForPaste = (page.isForPaste != null) ? page.isForPaste : isForPaste;
+      var _prettyPrint = (page.prettyPrint != null) ? page.prettyPrint : isPrettyPrint;
+      var _defaultPrettyPrint = (page.defaultPrettyPrint != null) ? page.defaultPrettyPrint : defaultPrettyPrint;
       title.innerHTML = page.title || obj.title || page.name || key || "&nbsp;";
       date.innerHTML = page.date || obj.date || "&nbsp;";
       base.innerHTML = "";
@@ -369,7 +373,7 @@ Readme.prototype = {
                     })(jQuery);
                   }
                   
-                  if(page.prettyPrint) {
+                  if(_prettyPrint) {
                     prettyPrint();
                   }
                   
@@ -728,8 +732,8 @@ Readme.prototype = {
         });
 
         //エスケープ
+        text = text.replace(/\r\n(\|{0,2})<(?=\r\n)/g, "\r\n\$1$lt;");
         text = text.replace(/</g, "&lt;");
-        text = text.replace(/\r\n>/g, "\r\n\$gt;");
         text = text.replace(/\$lt;/g, "<");
         text = text.replace(/\$gt;/g, ">");
 
@@ -743,11 +747,17 @@ Readme.prototype = {
         }
 
         //改行
-        text = text.replace(/~\r\n/g, "<br/>");
+        text = text.replace(/~\r\n(?! )/g, "<br/>");
 
         /*
         * ブロック要素
         */
+
+        //整形済みテキスト 事前変換
+        text = text.replace(/\r\n>\|(\|)?(\r\n(?:.|\r\n)*?|)\r\n\1\|<(?=\r\n( |>\|)?)/g, function(){
+          return (arguments[1] ? "\r\n |src|" : "\r\n |txt|") + arguments[2].replace(/\r\n/g, "\r\n ") +  (arguments[3] ? "\r\n" : "");
+        });
+
         //左寄せ・センタリング・右寄せ
         text = text.replace(/\r\n(LEFT|CENTER|RIGHT):(.*?)(?=\r\n)/g, "\r\n<p style='text-align:$1'>$2</p>");
 
@@ -756,7 +766,7 @@ Readme.prototype = {
         text = text.replace(/\r\n~(.*)(?=\r\n)/g, "\r\n<p>$1</p>");
 
         //引用文
-        //text = text.replace(/\r\n>(?:\r\n)?((?:.*?\r\n[^\r])*?.*?)(?=\r\n\r\n)/g, "\r\n<blockquote>$1</blockquote>");
+        text = text.replace(/\r\n>\r\n((?:.|\r\n)*?)\r\n<(?=\r\n)/g, "\r\n<blockquote>$1</blockquote>");
         text = text.replace(/\r\n>(.*?)(?=\r\n)/g, "\r\n<blockquote>$1</blockquote>");
 
         //番号なしリスト
@@ -926,7 +936,7 @@ Readme.prototype = {
           var type = arguments[1];
           var src = arguments[2];
           src = src.replace(/(^|\r\n) /g, "$1");
-          if(page.prettyPrint && (page.defaultPrettyPrint && (type != "txt")) || (!page.defaultPrettyPrint && (type == "src"))) {
+          if(_prettyPrint && (_defaultPrettyPrint && (type != "txt")) || (!_defaultPrettyPrint && (type == "src"))) {
             return "\r\n<pre class='prettyprint'>" + src + "</pre>";
           } else {
             return "\r\n<pre>" + src + "</pre>";
