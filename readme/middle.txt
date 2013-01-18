@@ -1,0 +1,233 @@
+﻿#contents
+----
+*解説/中級編 [#a99e836c]
+**シナリオ操作 [#e6da05bd]
+-[[解説/初級編#y1dcc379]]で解説したpush、keepメソッド以外にも、シナリオを操作するためのメソッドをいくつか用意しています。
+-以下のkeepメソッド以外は、呼び出し時にシナリオを設定するだけで、シナリオが実行されるわけではありません。直ちに実行したい場合は、keepメソッドを呼び出してからreturn等でシナリオ関数を終了してください。
+
+-keepメソッド
+--機能：シナリオ関数終了後、直ちに次のシナリオ関数を実行する。
+
+-pushメソッド
+--機能：サブシナリオを設定する。
+--第一引数：設定するサブシナリオ関数配列
+
+-retakeメソッド
+--機能：実行中のシナリオ関数配列の先頭に戻る。
+
+-skipメソッド
+--機能：実行中のシナリオ関数配列を終了する(親のシナリオ関数配列に戻る)。
+
+-repeatメソッド
+--機能：シナリオを進行させない(次も同じシナリオ関数を実行する)。
+
+-backメソッド
+--機能：実行中のシナリオ関数配列で、ひとつ前のシナリオ関数へ戻る。
+
+-resetメソッド
+--機能：デフォルトのシナリオ関数配列の先頭に戻る。
+
+-loopメソッド
+--機能：繰り返しを指定してサブシナリオを設定する。
+--第一引数：繰り返す回数、または繰り返し条件の関数配列(詳細後述)
+--第二引数：設定するサブシナリオ関数配列
+--補足：第一引数の繰り返し条件の関数配列とは、[初期処理関数, 継続条件判定関数, 繰り返し毎処理関数]形式の配列を意味する。各関数はいずれもTheaterインスタンスのメンバとして実行される。
+---初期処理関数：繰り返し処理開始前に実行される関数。
+---継続条件判定関数：各繰り返しの先頭で実行される関数。trueを返却すると繰り返し処理が継続され、falseを返却すると繰り返しを終了する。引数には繰り返し毎処理関数の返却値(初回であれば直前のシナリオ関数の返却値)が設定される。
+---繰り返し毎処理関数：各繰り返しの末尾で実行される関数。引数には直前に処理された関数の返却値が設定される。
+
+ new Theater({
+   img: [
+     "img/sample1.gif",
+     "img/sample2.gif",
+     "img/sample3.gif"
+   ],
+   scenario: [
+     function(){
+       this.act({
+         img: "img/sample1.gif",
+         msg: "シナリオ操作テスト開始。"
+       });
+     },
+     function(){
+       this.speak("サブシナリオ開始前。pushメソッドでサブシナリオを設定します・・・");
+     },
+     function(){
+       this.push(sub);
+       this.keep();
+     },
+     function(){
+       this.speak("メインシナリオに復帰しました。");
+     },
+     function(){
+       this.speak("画像切り替えを繰り返します。");
+       this.loop(2, [
+         function(){
+           this.appear("img/sample2.gif");
+         },
+         function(){
+           this.appear("img/sample3.gif");
+         }
+       ]);
+     },
+     function(){
+       this.act({
+         img: "img/sample1.gif",
+         msg: "3からカウントダウンします"
+       });
+       return false;
+     },
+     function(){
+       var count;
+       this.loop([
+         function(){ //初期処理関数
+           count = 3;
+         },
+         function(result){ //継続条件判定関数
+           return (!result && count >= 0);
+         },
+         function(result){ //繰り返し毎処理関数
+           count--;
+           return result;
+         },
+       ], [
+         function(){
+           this.speak("カウント： " + count);
+         },
+         function(){
+           if(count == 3){
+             this.confirm("中止しますか？");
+           }else{
+             this.keep();
+             return false;
+           }
+         }
+       ]);
+       this.keep();
+     },
+     function(){
+       this.speak("シナリオ操作テスト終了。");
+     }
+   ]
+ });
+ 
+ var sub = [
+   function(){
+     this.speak("サブシナリオ開始。");
+   },
+   function(){
+     this.speak("操作を選択してください。");
+   },
+   function(){
+     this.choice(["retake", "skip", "repeat", "back", "reset"]);
+   },
+   function(result){
+     var str = result + "が選択されました。"
+     switch(result){
+       case "retake":
+         str += "このサブシナリオの先頭に戻ります・・・";
+         this.retake();
+         break;
+       case "skip":
+         str += "メインシナリオに復帰します・・・";
+         this.skip();
+         break;
+       case "repeat":
+         str += "このシナリオ関数を繰り返します・・・※「はじめから」ボタンで戻ってください。";
+         this.repeat();
+         break;
+       case "back":
+         str += "一つ前のシナリオ関数に戻ります・・・";
+         this.back();
+         break;
+       case "reset":
+         str += "メインシナリオの先頭に戻ります・・・";
+         this.reset();
+         break;
+     }
+     this.speak(str);
+     return result;
+   },
+   function(result){
+     this.speak("サブシナリオ終了。");
+   }
+ ];
+
+**サブシナリオの選択ダウンロードと実行 [#xe03f3c7]
+-※この機能にはv2.0.0で不具合がありました。v2.0.1で修正されています。最新版のダウンロードをお願いいたします。
+-シナリオを最初にすべて読み込むのではなく、シナリオの途中で随時サブシナリオを読み込むことができます。シナリオが長くなった場合や、分岐により不要なシナリオがある場合に有効です。
+-このためには、readメソッドでスクリプトファイルを読み込み、playColdメソッドで実行します。
+
+-readメソッド
+--機能：スクリプトファイルを読み込む。
+--第一引数：スクリプトファイルアドレス
+--第二引数：スクリプトファイルの文字コード(指定なしの場合はHTMLファイルの文字コードに依存)
+
+-playColdメソッド
+--機能：指定シナリオが実行可能になるまで実行を試みる。試行中は画面上部に「SCENARIO LOADING...」を表示する。100秒でタイムアウト。
+--第一引数：実行するシナリオ名(文字列で指定)
+
+-必要に応じて次の「画像の選択ダウンロード」を行ってください。
+-例は最後にまとめます。
+
+**画像の選択ダウンロード [#a296a90f]
+-Theaterインスタンス生成時以外にも、シナリオの途中で随時画像を読み込むことができます。使用する画像が多くなった場合や、分岐により不要な画像がある場合に有効です。
+-このためには、preloadメソッドを使用します。
+
+-preloadメソッド
+--機能：スクリプト用に画像を先読みする。ダウンロード中は画面上部にダウンロード状況を表示する。100秒でタイムアウト(ダウンロード状況を非表示)。
+--第一引数：先読みする画像アドレス配列。
+
+ 【test.htm】
+ new Theater({
+   img: [
+     "img/sample1.gif"
+   ],
+   scenario: [
+     function(){
+       this.act({
+         img: "img/sample1.gif",
+         msg: "テスト開始。"
+       });
+     },
+     function(){
+       this.speak("クリックすると別ファイルを読み込んでサブシナリオを開始します・・・");
+     },
+     function(){
+       this.read("sub.js");
+       this.playCold("sub");
+     },
+     function(){
+       this.act({
+         img: "img/sample1.gif",
+         msg: "元のファイルのメインシナリオに復帰しました。"
+       });
+     },    
+     function(){
+       this.speak("テスト終了。");
+     }
+   ]
+ });
+
+ 【sub.js】
+ var sub = [
+   function(){
+     this.preload([
+       "img/sample2.gif",
+       "img/sample3.gif"
+     ]);
+     this.speak("別ファイルのサブシナリオ開始。同時に画像の先読みをしています。");
+   },
+   function(){
+     this.act({
+       img: "img/sample2.gif",
+       msg: "ここは別ファイルです。"
+     });
+   },
+   function(){
+     this.act({
+       img: "img/sample3.gif",
+       msg: "別ファイルのサブシナリオを終了します"
+     });
+   }
+ ];

@@ -1,0 +1,28 @@
+﻿*ファイルについて [#h908c4ac]
+-tjs$lt;var id="verzip"$gt;$lt;/var$gt;.zipを展開すると以下のファイルが得られます。
+
+ theater
+ │  readme.htm  : readme(このファイル)
+ │  index.htm   : サンプルhtml
+ │  scenario.js : サンプルシナリオファイル
+ │  style.css   : サンプルスタイルシート
+ │  test.htm    : 入門編用サンプルhtml
+ │  test.js     : 入門編用サンプルシナリオファイル
+ │
+ ├─ staff
+ │       theaterconstructor.js : スクリプトファイル読み込み用
+ │       prototype.js : prototype.js v1.5.0
+ │       prototype_extend.js : prototype.js独自拡張用
+ │       effects.js   : script.aculo.us v1.7.0 のeffect.js
+ │       dragdrop.js  : script.aculo.us v1.7.0 のdragdrop.js
+ │       theater.js   : theater.js本体
+ │       blank.gif    : 画像指定なしの場合に表示される画像
+ │
+ ├─ img : 画像格納用フォルダ
+ │         サンプルhtml用の画像も格納されています。
+ │
+ └─ readmesrc : readme用テキストフォルダ
+
+
+-theaterフォルダ直下のテキストファイルは文字コード:shift_jisで記述されています。
+-&color(red){staff, readmesrcフォルダのテキストファイルは文字コード:utf-8で記述されています。};

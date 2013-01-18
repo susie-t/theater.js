@@ -1,0 +1,26 @@
+﻿body{
+  font-size:12px;
+  margin-right:0px;
+  margin-bottom:0px;
+  letter-spacing:2px;
+  font-family:"ＭＳ Ｐ明朝", "Century", serif;
+}
+#menu, #select, .hiddenArea, span.navi, a.anchor_super, .notPrint, hr.clear{
+  display:none;
+}
+h1, h2, a, dt, table th, ol li{
+  font-family:"ＭＳ Ｐゴシック", "Helvetica", sans-serif;
+}
+p, dd, table td, ul li, blockquote{
+  font-family:"ＭＳ Ｐ明朝", "Century", serif;
+  font-size:12px;
+  letter-spacing:2px;
+}
+table, table tr, table th, table td{
+  border-style:solid;
+  border-width:1px;
+  border-color:#000000;
+}
+div.end{
+  page-break-before: always;
+}
